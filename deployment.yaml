@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: moody-app
+  labels:
+    app: moody-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: moody-app
+  template:
+    metadata:
+      labels:
+        app: moody-app
+    spec:
+      imagePullSecrets:
+      - name: dockerhubkey
+      containers:
+      - name: moody-app
+        image: PRIVATE-REPO/IMAGE@sha256:UNIQUE_HASH
+        imagePullPolicy: Always
+        env:
+          - name: KAFKA_SERVER
+            valueFrom:
+              secretKeyRef:
+                name: kafka-path
+                key: KAFKA_SERVER
+          - name: KAFKA_TOPIC
+            valueFrom:
+              secretKeyRef:
+                name: kafka-path
+                key: KAFKA_TOPIC
+        ports:
+          - containerPort: 3000

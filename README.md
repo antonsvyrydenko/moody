@@ -59,23 +59,39 @@ For this project `DigitalOcean` `k8s` cluster was used.
 
      `kubectl --kubeconfig=/<pathtodirectory>/CLUSTER_NAME-kubeconfig.yaml get secret -o yaml`
 
-2. Build and deploy app
+2. Create `Kafka` topic for app
 
-   2.1 `docker build -t moody:latest .`
+    2.1 Login to server with `Kafka` and get into the folder with `Kafka` scripts
 
-   2.2 `docker tag moody:latest PRIVATE_REPO/moody:latest`
+       `ssh root@YOUR_KAFKA_SERVER` 
 
-   2.3 `docker push PRIVATE_REPO/moody:latest`
+       `cd ~/kafka_src/kafka_VERSION/bin`
 
-   2.4 Update `deployment.yaml` - set repo and image new hash (get it on `DockerHub` dashboard)
+    2.2 Create topic
+  
+       `./kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 2 --topic KAFKA_TOPIC`
+
+    2.3 Watch topic log
+
+       `./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic KAFKA_TOPIC --from-beginning`
+
+3. Build and deploy app
+
+   3.1 `docker build -t moody:latest .`
+
+   3.2 `docker tag moody:latest PRIVATE_REPO/moody:latest`
+
+   3.3 `docker push PRIVATE_REPO/moody:latest`
+
+   3.4 Update `deployment.yaml` - set repo and image new hash (get it on `DockerHub` dashboard)
 
      `image: PRIVATE-REPO/IMAGE@sha256:UNIQUE_HASH`
 
-   2.5 Deploy app
+   3.5 Deploy app
 
      `kubectl --kubeconfig=/<pathtodirectory>/CLUSTER_NAME-kubeconfig.yaml apply -f deployment.yaml`
 
-   2.6 Check nodes and pods
+   3.6 Check nodes and pods
 
      `kubectl --kubeconfig=/<pathtodirectory>/CLUSTER_NAME-kubeconfig.yaml get nodes`
 
@@ -83,29 +99,14 @@ For this project `DigitalOcean` `k8s` cluster was used.
 
      `kubectl --kubeconfig=/<pathtodirectory>/CLUSTER_NAME-kubeconfig.yaml describe pods`
 
-   2.7 Check environment of pod
+   3.7 Check environment of pod
 
      `kubectl --kubeconfig=/<pathtodirectory>/CLUSTER_NAME-kubeconfig.yaml exec -it POD_ID -- env`
 
-   2.8 Check logs of pod
+   3.8 Check logs of pod
 
      `kubectl --kubeconfig=/<pathtodirectory>/CLUSTER_NAME-kubeconfig.yaml logs POD_ID`
 
-3. Create `Kafka` topic for app
-
-    3.1 Login to server with `Kafka` and get into the folder with `Kafka` scripts
-
-       `ssh root@YOUR_KAFKA_SERVER` 
-
-       `cd ~/kafka_src/kafka_VERSION/bin`
-
-    3.2 Create topic
-  
-       `./kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 2 --topic KAFKA_TOPIC`
-
-    3.3 Watch topic log
-
-       `./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic KAFKA_TOPIC --from-beginning`
 
 ### Usage
 
